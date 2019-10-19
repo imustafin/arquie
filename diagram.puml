@@ -1,0 +1,4 @@
+@startuml
+!include /puml/Archimate.puml
+Motivation_Stakeholder(StakeholderElement, "Stakeholder Description")
+@enduml
