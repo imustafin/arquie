@@ -1,4 +1,4 @@
-from py2neo import Graph
+from py2neo import Graph, Relationship, Node
 
 g = Graph(user='neo4j', password='123')
 
@@ -85,14 +85,30 @@ def derive_relationships():
 
     return rels
 
+def make_rels():
+    n = 0
+    m = 0
+    while True:
+        n += 1
+        # print('Deriving relationships, iteration', n)
+        
+        rels = derive_relationships()
+        if not rels:
+            break
+
+        for r in rels:
+            m += 1
+            # g.create(Relationship(r['from'], r['type'], r['to']))
+            print(r['desc'])
+
+        return
+
+    print('Derived', m, 'relationships in total')
 
 def main():
     print_warnings()
 
-    rels = derive_relationships()
-    for r in rels:
-        print('~~~')
-        print(format_rel(r))
+    make_rels()
 
 if __name__ == '__main__':
     main()
