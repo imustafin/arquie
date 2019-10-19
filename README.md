@@ -3,7 +3,7 @@ User-friendly queries and suggestions for Archimate models
 
 ## Installation
 ### Start the docker containers
-```docker-compose up**
+```docker-compose up```
 
 ### Export Archimate model into the Neo4j
 Use the plugin to export it into the db.
