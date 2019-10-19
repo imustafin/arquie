@@ -25,16 +25,37 @@ def print_duplicate_name_warnings():
 def print_warnings():
     print_duplicate_name_warnings()
 
+APP = 'ApplicationComponent'
+APP_SRV = 'ApplicationService'
+API = 'ApplicationInterface'
+ASSGN = 'AssignmentRelationships'
+SERVES = 'ServingRelationships'
+BUS_PROC = 'BusinessProcess'
+COMP = 'CompositionRelationships'
+APP_FUNC = 'ApplicationFunction'
+REALIZES = 'RealizationRelationships'
 
-def derive_app_serves_interface_to_app():
+
+RULES = [
+    ((APP, ASSGN, APP_SRV, SERVES, APP), SERVES),
+    ((APP, ASSGN, APP_SRV, SERVES, BUS_PROC), SERVES),
+    ((APP, COMP, API, SERVES, APP), SERVES),
+    ((APP, ASSGN, APP_FUNC, REALIZES, APP_SRV), REALIZES),
+    ((APP, ASSGN, APP_FUNC, COMP, APP_FUNC), ASSGN)
+]
+
+def derive_by_rule(rule):
+    types, rel_type = rule
+    tsa, t1, ts, t2, tsc = types
+
     ans = []
     for r in g.run(
-            'MATCH (sa)-[:AssignmentRelationships]->'
-            '(s)-[r:ServingRelationships]->(sc)'
-            'WHERE sa.class="ApplicationComponent"'
-            ' AND s.class="ApplicationService"'
-            ' AND sc.class="ApplicationComponent"'
-            ' AND NOT (sa)-[:ServingRelationships]-(sc)'
+            'MATCH (sa)-[:' + t1 + ']->'
+            '(s)-[r:' + t2 + ']->(sc)'
+            'WHERE sa.class="' + tsa + '"'
+            ' AND s.class="' + ts + '"'
+            ' AND sc.class="' + tsc + '"'
+            ' AND NOT (sa)-[:' + rel_type + ']-(sc)'
             'RETURN sa, sc, s'):
         sa = r['sa']
         sc = r['sc']
@@ -45,13 +66,13 @@ def derive_app_serves_interface_to_app():
             'type': 'Serves',
             'to': sc,
             'desc': (format_node(sa)
-                     + ' serves interface '
+                     + ' ' + t1 + ' '
                      + format_node(s)
-                     + ' which serves to '
+                     + ' ' + t2 + ' '
                      + format_node(sc)
                      + ', this means that '
                      + format_node(sa)
-                     + ' serves '
+                     + ' ' + rel_type + ' '
                      + format_node(sc))
         })
 
@@ -59,7 +80,8 @@ def derive_app_serves_interface_to_app():
 
 def derive_relationships():
     rels = []
-    rels += derive_app_serves_interface_to_app()
+    for r in RULES:
+        rels += derive_by_rule(r)
 
     return rels
 
