@@ -41,7 +41,7 @@ RULES = [
     ((APP, ASSGN, APP_SRV, SERVES, BUS_PROC), SERVES),
     ((APP, COMP, API, SERVES, APP), SERVES),
     ((APP, ASSGN, APP_FUNC, REALIZES, APP_SRV), REALIZES),
-    ((APP, ASSGN, APP_FUNC, COMP, APP_FUNC), ASSGN)
+    ((APP, ASSGN, APP_FUNC, COMP, APP_FUNC), ASSGN),
 ]
 
 def derive_by_rule(rule):
@@ -63,7 +63,7 @@ def derive_by_rule(rule):
 
         ans.append({
             'from': sa,
-            'type': 'Serves',
+            'type': rel_type,
             'to': sc,
             'desc': (format_node(sa)
                      + ' ' + t1 + ' '
@@ -90,7 +90,7 @@ def make_rels():
     m = 0
     while True:
         n += 1
-        # print('Deriving relationships, iteration', n)
+        print('Deriving relationships, iteration', n)
         
         rels = derive_relationships()
         if not rels:
@@ -98,10 +98,8 @@ def make_rels():
 
         for r in rels:
             m += 1
-            # g.create(Relationship(r['from'], r['type'], r['to']))
+            g.create(Relationship(r['from'], r['type'], r['to']))
             print(r['desc'])
-
-        return
 
     print('Derived', m, 'relationships in total')
 
@@ -162,11 +160,11 @@ def query_relation_parse():
 
 def main():
     print_warnings()
+    make_rels()
    
     while(True):
     	query()
 
-    make_rels()
 
 if __name__ == '__main__':
     main()
